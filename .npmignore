@@ -1,0 +1,9 @@
+/lintRules
+/test
+
+/.babelrc.js
+/.eslintrc.js
+/.gitignore
+/.npmignore
+/tsconfig.json
+/yarn.lock
