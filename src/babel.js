@@ -25,12 +25,6 @@ const transform = (t, path) => {
     imp.specifiers = imp.specifiers.filter((s) => !t.isImportSpecifier(s) || !transformImports.includes(s.imported.name))
   })
 
-  importNodePaths.forEach((p) => {
-    if (!p.node.specifiers.length) {
-      p.remove()
-    }
-  })
-
   if (needTransformImports.length) {
     const specifiers = needTransformImports.map((item) => t.importSpecifier(
       t.identifier(item.localName),
@@ -42,6 +36,12 @@ const transform = (t, path) => {
       rcaImport,
     )
   }
+
+  mboxImportNodes.forEach((p) => {
+    if (!p.node.specifiers.length) {
+      p.remove()
+    }
+  })
 }
 
 module.exports = ({ types: t }) => ({
