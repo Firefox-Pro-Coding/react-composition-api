@@ -2,11 +2,13 @@ import React from 'react'
 import * as mobx from 'mobx'
 import { observer } from 'mobx-react-lite'
 
+type CallBackFunction = () => unknown
+
 interface ComponentStore {
   disposes: Array<mobx.IReactionDisposer>
-  hooks: Array<any>
-  mounted: Array<any>
-  unmounted: Array<any>
+  hooks: Array<CallBackFunction>
+  mounted: Array<CallBackFunction>
+  unmounted: Array<CallBackFunction>
 }
 
 let currentComponentStore: null | ComponentStore = null
@@ -19,12 +21,18 @@ const checkInsideSetup = (name: string) => {
   }
 }
 
+
 const pushDispose = (dispose: mobx.IReactionDisposer) => {
   if (currentComponentStore !== null) {
     currentComponentStore.disposes.push(dispose)
   }
 }
 
+
+/**
+ * callback is executed on each render. you can use hooks inside callback.
+ * despite it's name, you can put arbitrary code in here.
+ */
 export const runHook = <T extends unknown>(fn: () => T) => {
   checkInsideSetup('runHook')
   const r = fn()
@@ -32,23 +40,32 @@ export const runHook = <T extends unknown>(fn: () => T) => {
   return r
 }
 
-export const onMounted = (cb: any) => {
+
+/**
+ * callback is executed when component is mounted.
+ */
+export const onMounted = (cb: CallBackFunction) => {
   checkInsideSetup('onMounted')
   currentComponentStore!.mounted.push(cb)
 }
 
-export const onUnmounted = (cb: any) => {
+/**
+ * callback is executed when component is unmounted.
+ */
+export const onUnmounted = (cb: CallBackFunction) => {
   checkInsideSetup('onUnmounted')
   currentComponentStore!.unmounted.push(cb)
 }
 
+
 export const observable = ((...args: Parameters<typeof mobx.observable>) => {
   if (insideSetup()) {
-    const hook = () => React.useRef<any>(null)
+    const hook = () => React.useRef<unknown>(null)
     const ref = hook()
     if (!ref.current) {
       ref.current = mobx.observable(...args)
     }
+
     currentComponentStore?.hooks.push(hook)
     return ref.current
   }
@@ -68,9 +85,9 @@ const observableStaticMethodFields = [
 ] as const
 
 observableStaticMethodFields.forEach((key) => {
-  observable[key] = ((...args: Array<any>) => {
+  observable[key] = ((...args: Array<unknown>) => {
     if (insideSetup()) {
-      const hook = () => React.useRef<any>(null)
+      const hook = () => React.useRef<unknown>(null)
       const ref = hook()
       if (!ref.current) {
         ref.current = (mobx.observable[key] as any)(...args)
@@ -82,22 +99,29 @@ observableStaticMethodFields.forEach((key) => {
   }) as any
 })
 
+
 export const reaction = (...args: Parameters<typeof mobx.reaction>) => {
   const dispose = mobx.reaction(...args)
   pushDispose(dispose)
 }
+
 
 export const autorun = (...args: Parameters<typeof mobx.autorun>) => {
   const dispose = mobx.autorun(...args)
   pushDispose(dispose)
 }
 
+
 export const when = (...args: Parameters<typeof mobx.when>) => {
   const dispose = mobx.when(...args)
   pushDispose(dispose)
 }
 
-// export const defineComponent = <P extends unknown>(setup: (p: P) => () => JSX.Element) => {
+/**
+ * create component from setupFunction.
+ * https://github.com/Firefox-Pro-Coding/react-composition-api#api-reference
+ * @param setup - recieve a shallow reactive props as argument, returns a render function
+ */
 export const defineComponent = <P extends unknown>(setup: (p: P) => React.FunctionComponent) => {
   const Component = observer((newProps: any) => {
     const propsRef = React.useRef<any>(null)
@@ -120,17 +144,17 @@ export const defineComponent = <P extends unknown>(setup: (p: P) => React.Functi
       }
     })
 
-    const cachedSetup = React.useRef<any>(null)
+    const cachedSetup = React.useRef<unknown>(null)
     const component = React.useRef<any>(null)
 
-    const componentStore = React.useRef({
+    const componentStore = React.useRef<ComponentStore>({
       hooks: [],
       disposes: [],
       mounted: [],
       unmounted: [],
-    } as ComponentStore)
+    })
 
-    const nextComponentStore = React.useRef(null as null | ComponentStore)
+    const nextComponentStore = React.useRef<ComponentStore | null>(null)
 
     React.useEffect(() => {
       if (nextComponentStore.current) {
@@ -171,5 +195,5 @@ export const defineComponent = <P extends unknown>(setup: (p: P) => React.Functi
     return component.current()
   })
 
-  return Component
+  return Component as React.FunctionComponent<P>
 }

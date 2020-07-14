@@ -38,14 +38,13 @@ const transform = (t, path) => {
   }
 
   mboxImportNodes.forEach((p) => {
-    if (!p.node.specifiers.length) {
+    if (p.node && !p.node.specifiers.length) {
       p.remove()
     }
   })
 }
 
 module.exports = ({ types: t }) => ({
-  // inherits: syntaxJsx,
   visitor: {
     Program(path) {
       transform(t, path)

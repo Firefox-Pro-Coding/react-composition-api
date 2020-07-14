@@ -9,7 +9,8 @@
   "scripts": {
     "build": "rimraf dist && yarn tsc",
     "test:build": "yarn tsc -p ./test/tsconfig.json",
-    "test:debug": "node --inspect-brk ./node_modules/@babel/cli/bin/babel.js ./test_dist/test.js",
+    "test": "node ./node_modules/@babel/cli/bin/babel.js ./test_dist/babel/test.js",
+    "test:debug": "node --inspect-brk ./node_modules/@babel/cli/bin/babel.js ./test_dist/babel/test.js",
     "lint": "eslint --ext \"js,jsx,ts,tsx\" ./src/"
   },
   "dependencies": {},
