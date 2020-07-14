@@ -1,6 +1,8 @@
 import React from 'react';
 import { observable, reaction } from 'mobx';
+import * as mobx from 'mobx';
 import { defineComponent } from '@firefox-pro-coding/react-composition-api';
+console.log(mobx)
 
 interface Props {
   count: number

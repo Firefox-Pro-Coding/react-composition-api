@@ -8,6 +8,8 @@
   "license": "MIT",
   "scripts": {
     "build": "rimraf dist && yarn tsc",
+    "test:build": "yarn tsc -p ./test/tsconfig.json",
+    "test:debug": "node --inspect-brk ./node_modules/@babel/cli/bin/babel.js ./test_dist/test.js",
     "lint": "eslint --ext \"js,jsx,ts,tsx\" ./src/"
   },
   "dependencies": {},
