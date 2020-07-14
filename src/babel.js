@@ -22,7 +22,7 @@ const transform = (t, path) => {
         })
       }
     })
-    imp.specifiers = imp.specifiers.filter((s) => !transformImports.includes(s.imported.name))
+    imp.specifiers = imp.specifiers.filter((s) => !t.isImportSpecifier(s) || !transformImports.includes(s.imported.name))
   })
 
   importNodePaths.forEach((p) => {
