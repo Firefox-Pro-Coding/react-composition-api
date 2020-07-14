@@ -1,8 +1,10 @@
 /lintRules
 /test
+/test_dist
 
 /.babelrc.js
 /.eslintrc.js
+/.eslintignore
 /.gitignore
 /.npmignore
 /tsconfig.json
