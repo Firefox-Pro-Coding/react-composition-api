@@ -5,6 +5,7 @@
 /.babelrc.js
 /.eslintrc.js
 /.eslintignore
+/.editorconfig
 /.gitignore
 /.npmignore
 /tsconfig.json
