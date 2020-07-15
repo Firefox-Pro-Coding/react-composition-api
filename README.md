@@ -113,10 +113,10 @@ export const App = defineComponent((_props) => {
 - **defineComponent**
   ```jsx
   const Component = definedComponent((props) => () => {
-    // props is reactive
-    // setup step
+    // props is shallow reactive
+    // define your state actions in here
 
-    // the render function
+    // the render function used to render the component
     // will be wrapped in mobx.observer automatically
     return () => (
       <div>component</div>
@@ -128,7 +128,7 @@ export const App = defineComponent((_props) => {
   setupFunction recive `props` as it's argument. `props` is a stable reference and made shallow reactive, so you can use mobx reactions to watch changes on props.
 
 - **observable, reaction, autorun, when**
-  These are wrapper of mobx apis and do exactly the same thing as the same name in mobx, except when inside the setupFunction, and will be automatically dispose when component unmount.  
+  These are wrapper of mobx apis and do exactly the same thing as the same name in mobx, except when called synchronously inside the setupFunction, and will be automatically dispose when component unmount.  
 
   Use the babel plugin to auto transform these imports from mobx to this package.
 
@@ -139,7 +139,9 @@ export const App = defineComponent((_props) => {
   ```
   Callbacks will be called when the component mounted and unmounted.  
 
-  Callback are wrapped in `React.useEffect` hook, so using onMounted and onUnmounted is basically the same as React.useEffect with empty array as deps, except it is allow to use inside if statement, and the order doesn't matter.
+  Callback are wrapped in `React.useEffect` hook, so using onMounted and onUnmounted is basically the same as React.useEffect with empty array as deps, except it is allow to use inside if statement, and the order doesn't matter.  
+
+  Reactions won't be auto torn down in life cyclehooks.  
 
   Tips: You can call `onUnmounted` synchronously inside `onMounted`.
 

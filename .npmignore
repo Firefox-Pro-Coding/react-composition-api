@@ -10,3 +10,4 @@
 /.npmignore
 /tsconfig.json
 /yarn.lock
+/*.tgz

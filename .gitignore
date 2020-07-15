@@ -2,3 +2,4 @@
 /lib
 /yarn-error.log
 /test_dist
+/*.tgz

@@ -9,6 +9,7 @@ interface ComponentStore {
   hooks: Array<CallBackFunction>
   mounted: Array<CallBackFunction>
   unmounted: Array<CallBackFunction>
+  mountedStage: boolean
 }
 
 let currentComponentStore: null | ComponentStore = null
@@ -23,7 +24,7 @@ const checkInsideSetup = (name: string) => {
 
 
 const pushDispose = (dispose: mobx.IReactionDisposer) => {
-  if (currentComponentStore !== null) {
+  if (currentComponentStore !== null && !currentComponentStore.mountedStage) {
     currentComponentStore.disposes.push(dispose)
   }
 }
@@ -100,21 +101,26 @@ observableStaticMethodFields.forEach((key) => {
 })
 
 
-export const reaction = (...args: Parameters<typeof mobx.reaction>) => {
-  const dispose = mobx.reaction(...args)
+export const reaction: typeof mobx.reaction = (...args: Array<any>) => {
+  const dispose = (mobx.reaction as any)(...args)
   pushDispose(dispose)
+  return dispose
 }
 
 
-export const autorun = (...args: Parameters<typeof mobx.autorun>) => {
-  const dispose = mobx.autorun(...args)
+export const autorun: typeof mobx.autorun = (...args: Array<any>) => {
+  const dispose = (mobx.autorun as any)(...args)
   pushDispose(dispose)
+  return dispose
 }
 
 
-export const when = (...args: Parameters<typeof mobx.when>) => {
-  const dispose = mobx.when(...args)
-  pushDispose(dispose)
+export const when: typeof mobx.when = (...args: Array<any>) => {
+  const dispose = (mobx.when as any)(...args)
+  if (typeof dispose === 'function') {
+    pushDispose(dispose)
+  }
+  return dispose
 }
 
 /**
@@ -152,6 +158,7 @@ export const defineComponent = <P extends unknown>(setup: (p: P) => React.Functi
       disposes: [],
       mounted: [],
       unmounted: [],
+      mountedStage: false,
     })
 
     const nextComponentStore = React.useRef<ComponentStore | null>(null)
@@ -162,7 +169,9 @@ export const defineComponent = <P extends unknown>(setup: (p: P) => React.Functi
         nextComponentStore.current = null
       }
       currentComponentStore = componentStore.current
+      currentComponentStore.mountedStage = true
       componentStore.current.mounted.forEach((v) => v())
+      currentComponentStore.mountedStage = false
       currentComponentStore = null
       return () => {
         componentStore.current.disposes.forEach((v) => v())
@@ -179,6 +188,7 @@ export const defineComponent = <P extends unknown>(setup: (p: P) => React.Functi
         disposes: [],
         mounted: [],
         unmounted: [],
+        mountedStage: false,
       }
       currentComponentStore = nextComponentStore.current
       cachedSetup.current = setup
