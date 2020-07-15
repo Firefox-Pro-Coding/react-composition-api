@@ -141,6 +141,8 @@ export const App = defineComponent((_props) => {
 
   Callback are wrapped in `React.useEffect` hook, so using onMounted and onUnmounted is basically the same as React.useEffect with empty array as deps, except it is allow to use inside if statement, and the order doesn't matter.
 
+  Tips: You can call `onUnmounted` synchronously inside `onMounted`.
+
 - **runhook**
   ```ts
   const result = runHook(() => {

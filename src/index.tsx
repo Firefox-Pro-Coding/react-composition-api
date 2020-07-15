@@ -161,7 +161,9 @@ export const defineComponent = <P extends unknown>(setup: (p: P) => React.Functi
         componentStore.current = nextComponentStore.current
         nextComponentStore.current = null
       }
+      currentComponentStore = componentStore.current
       componentStore.current.mounted.forEach((v) => v())
+      currentComponentStore = null
       return () => {
         componentStore.current.disposes.forEach((v) => v())
         componentStore.current.disposes = []
