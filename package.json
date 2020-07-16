@@ -1,9 +1,9 @@
 {
   "name": "@firefox-pro-coding/react-composition-api",
+  "description": "Writing react component with composition api",
   "version": "0.0.4",
   "main": "lib/index.js",
   "typings": "lib/index.d.ts",
-  "repository": "git@github.com:Firefox-Pro-Coding/react-composition-api.git",
   "author": "noe132 <nnnnoe132@gmail.com>",
   "license": "MIT",
   "scripts": {
@@ -11,6 +11,7 @@
     "test:build": "yarn tsc -p ./test/tsconfig.json",
     "test": "jest",
     "test:debug": "node --inspect-brk ./node_modules/@babel/cli/bin/babel.js ./test_dist/babel/test.js",
+    "prepublish": "yarn build",
     "lint": "eslint --ext \"js,jsx,ts,tsx\" ./src/"
   },
   "dependencies": {},
@@ -43,5 +44,13 @@
     "rimraf": "^3.0.2",
     "ts-jest": "^26.1.2",
     "typescript": "^3.9.6"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Firefox-Pro-Coding/react-composition-api"
+  },
+  "bugs": {
+    "url": "https://github.com/Firefox-Pro-Coding/react-composition-api/issues"
+  },
+  "homepage": "https://github.com/Firefox-Pro-Coding/react-composition-api"
 }
