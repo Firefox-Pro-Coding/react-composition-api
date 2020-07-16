@@ -18,8 +18,11 @@
       "ScriptHost",
       "ESNext",
     ],
+    "types": [
+      "node",
+      "jest"
+    ],
     "paths": {
-      "@/*": ["src/*"]
     },
   },
   "include": ["./"]

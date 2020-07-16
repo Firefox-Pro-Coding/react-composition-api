@@ -1,4 +1,4 @@
-const path = require('path');
+const path = require('path')
 
 module.exports = {
   'globals': {
@@ -22,7 +22,10 @@ module.exports = {
   'settings': {
     'import/resolver': {
       'typescript': {
-        'directory': __dirname,
+        'directory': [
+          __dirname,
+          path.join(__dirname, 'test'),
+        ],
       },
     },
   },
@@ -72,4 +75,4 @@ module.exports = {
     '@typescript-eslint/no-parameter-properties': 'off',
     '@typescript-eslint/prefer-optional-chain': 'off',
   },
-};
+}

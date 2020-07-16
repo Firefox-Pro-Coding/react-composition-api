@@ -81,7 +81,7 @@ export const App = defineComponent((_props) => {
     count: 0,
   })
 
-  const box = React.createRef<HTMLDivElement>(null)
+  const box = React.createRef<HTMLDivElement>()
 
   // life cycle hooks
   onMounted(() => { console.log('mounted') })
@@ -128,7 +128,7 @@ export const App = defineComponent((_props) => {
   setupFunction receive `props` as it's argument. `props` is a stable reference and made shallow reactive, so you can use mobx reactions to watch changes on props.
 
 - **observable, reaction, autorun, when**
-  These are wrappers of mobx api and do exactly the same thing as the same name in mobx, except when called synchronously inside the setupFunction, and will be automatically dispose when component unmount.  
+  These are wrappers of mobx api and do exactly the same thing as the same name in mobx, except when called synchronously inside the setupFunction, and will be automatically disposed when component unmount.  
 
   Use the babel plugin to auto transform these imports from mobx to this package.
 
@@ -147,14 +147,23 @@ export const App = defineComponent((_props) => {
 
 - **runhook**
   ```ts
-  const result = runHook(() => {
+  runHook(() => {
     const value = React.useContext(MyContext)
     state.contextValue = value
-    return value
   })
   ```
   Callback passes to `runHook` will run every time before the component renders, just like normal hooks.  
 
-  The return value of `runHook` is the return value of the callback on its first execution, so once after the first execution, `result` here is never changed. To react to changes, modify the state inside the callback. Normal hooks rules apply here, so you cant call hooks inside if statement.
+  To react to changes, modify the state inside the callback. Normal hooks rules apply here, so you cant call hooks inside if statement.
 
-  Despite its name runHook, you can actually put anything inside it. It will run in every render, like in a normal functional component. putting a console.log in here is a typical way to monitoring re-renders.
+  Despite its name runHook, you can put anything inside it. It runs in every render, like in a normal functional component. putting a console.log in here is a typical way to monitoring re-renders.
+
+- **getOriginalProps**
+  ```ts
+  runHook(() => {
+    const originalProps = getOriginalProps(props)
+  })
+  ```
+  Get the non-reactive props object, it can be use to prevent duplicate render cause by making the props reactive. If a component using some props in the render function, each time props update, the component will re-render twice, the first render is caused by React updating props, and the second render is caused by the reactive props update. Normally you wouldn't need to use this, but it's useful when there are some components with frequent props updates or heavy rerender function.
+
+  It's not a stable reference, so get it as close as where you want to use it.

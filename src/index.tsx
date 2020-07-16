@@ -1,12 +1,13 @@
 import React from 'react'
-import * as mobx from 'mobx'
 import { observer } from 'mobx-react-lite'
+import * as mobx from 'mobx'
 
 type CallBackFunction = () => unknown
 
 interface ComponentStore {
   disposes: Array<mobx.IReactionDisposer>
   hooks: Array<CallBackFunction>
+  subHooks: Array<CallBackFunction>
   mounted: Array<CallBackFunction>
   unmounted: Array<CallBackFunction>
   mountedStage: boolean
@@ -36,9 +37,7 @@ const pushDispose = (dispose: mobx.IReactionDisposer) => {
  */
 export const runHook = <T extends unknown>(fn: () => T) => {
   checkInsideSetup('runHook')
-  const r = fn()
-  currentComponentStore!.hooks.push(fn)
-  return r
+  currentComponentStore!.subHooks.push(fn)
 }
 
 
@@ -123,38 +122,51 @@ export const when: typeof mobx.when = (...args: Array<any>) => {
   return dispose
 }
 
+const weakMap = new WeakMap()
+
+export const getOriginalProps = <T extends unknown>(t: T) => {
+  const data = weakMap.get(t as any)
+  if (!data) {
+    // TODO:
+    throw new Error()
+  }
+  return data as T
+}
+
 /**
  * create component from setupFunction.
  * https://github.com/Firefox-Pro-Coding/react-composition-api#api-reference
  * @param setup - recieve a shallow reactive props as argument, returns a render function
  */
-export const defineComponent = <P extends unknown>(setup: (p: P) => React.FunctionComponent) => {
+export const defineComponent = <P extends unknown>(
+  setup: (p: P) => React.FunctionComponent,
+) => {
   const Component = observer((newProps: any) => {
     const propsRef = React.useRef<any>(null)
     if (propsRef.current === null) {
-      propsRef.current = mobx.observable({}, {}, { deep: false })
+      propsRef.current = mobx.observable(newProps, {}, { deep: false })
+    } else {
+      mobx.runInAction(() => {
+        const currentProps = propsRef.current
+        const currentPropsKeys = mobx.keys(currentProps) as Array<string>
+        const newPropsKeys = Object.keys(newProps)
+        const deleteKeys = currentPropsKeys.filter((v) => !newPropsKeys.includes(v))
+
+        Object.assign(propsRef.current, newProps)
+
+        deleteKeys.forEach((key) => {
+          mobx.remove(currentProps, key)
+        })
+      })
     }
-
-    const currentProps = propsRef.current
-    const currentPropsKeys = mobx.keys(currentProps) as Array<string>
-    const newPropsKeys = Object.keys(newProps)
-    const deleteKeys = currentPropsKeys.filter((v) => !newPropsKeys.includes(v))
-
-    deleteKeys.forEach((key) => {
-      mobx.remove(currentProps, key)
-    })
-
-    newPropsKeys.forEach((key) => {
-      if (newProps[key] !== currentProps[key]) {
-        mobx.set(currentProps, key, newProps[key])
-      }
-    })
+    weakMap.set(propsRef.current, newProps)
 
     const cachedSetup = React.useRef<unknown>(null)
     const component = React.useRef<any>(null)
 
     const componentStore = React.useRef<ComponentStore>({
       hooks: [],
+      subHooks: [],
       disposes: [],
       mounted: [],
       unmounted: [],
@@ -185,6 +197,7 @@ export const defineComponent = <P extends unknown>(setup: (p: P) => React.Functi
       componentStore.current.disposes = []
       nextComponentStore.current = {
         hooks: [],
+        subHooks: [],
         disposes: [],
         mounted: [],
         unmounted: [],
@@ -193,8 +206,10 @@ export const defineComponent = <P extends unknown>(setup: (p: P) => React.Functi
       currentComponentStore = nextComponentStore.current
       cachedSetup.current = setup
       component.current = setup(propsRef.current)
+      currentComponentStore.subHooks.forEach((v) => v())
     } else {
       componentStore.current.hooks.forEach((v) => v())
+      componentStore.current.subHooks.forEach((v) => v())
     }
 
     if (nextComponentStore.current) {
