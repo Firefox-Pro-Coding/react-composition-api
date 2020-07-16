@@ -13,15 +13,14 @@
     "test:debug": "node --inspect-brk ./node_modules/@babel/cli/bin/babel.js ./test_dist/babel/test.js",
     "lint": "eslint --ext \"js,jsx,ts,tsx\" ./src/"
   },
-  "dependencies": {
-    "@types/node": "^14.0.23"
-  },
+  "dependencies": {},
   "devDependencies": {
     "@babel/cli": "^7.10.4",
     "@babel/core": "^7.10.4",
     "@babel/preset-typescript": "^7.10.4",
     "@testing-library/react": "^10.4.7",
     "@types/jest": "^26.0.4",
+    "@types/node": "^14.0.23",
     "@types/react": "^16.9.42",
     "@types/react-test-renderer": "^16.9.2",
     "@typescript-eslint/eslint-plugin": "^3.6.0",
@@ -44,17 +43,5 @@
     "rimraf": "^3.0.2",
     "ts-jest": "^26.1.2",
     "typescript": "^3.9.6"
-  },
-  "peerDependencies": {
-    "@types/react": "^16.8.6",
-    "mobx": "^5",
-    "mobx-react-lite": "^2",
-    "react": "^16.8.0",
-    "react-dom": "^16.8.0"
-  },
-  "peerDependenciesMeta": {
-    "@types/react": {
-      "optional": true
-    }
   }
 }
