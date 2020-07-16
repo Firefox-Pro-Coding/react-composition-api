@@ -5,7 +5,7 @@
 ![David](https://img.shields.io/david/Firefox-Pro-Coding/react-composition-api.svg?style=flat-square)
 ![David](https://img.shields.io/david/dev/Firefox-Pro-Coding/react-composition-api.svg?style=flat-square)
 
-> Writing react component with mindset of vue composition api! 🙌  
+> Writing react component with the mindset of vue composition api! 🙌  
 > To learn more about the concept of composition api: https://vue-composition-api-rfc.netlify.app/
 
 ## Install
@@ -22,7 +22,7 @@ const Component = defineComponent((props) => renderFunction)
 ```
 Pass a setup function to `defineComponent` to create a Component.  
 
-`setupFunction` recieve props object as argument. `props` is a [shallow reactive object](https://mobx.js.org/refguide/api.html#decorators), you can use `reaction` to watch changes on props.
+`setupFunction` receive props object as an argument. `props` is a [shallow reactive object](https://mobx.js.org/refguide/api.html#decorators), you can use `reaction` to watch changes on props.
 
 Upon component per component instance creation, `setupFunction` will be running only once and should return a function accepts no argument that returns JSX. Only the returned function will be running again to generate the new virtual dom.  
 
@@ -123,12 +123,12 @@ export const App = defineComponent((_props) => {
     )
   })
   ```
-  Pass a `setupFunction` to defineComponent to create a component. setupFunction should return a render function that recieves no arguments and returns JSX.  
+  Pass a `setupFunction` to defineComponent to create a component. setupFunction should return a render function that receives no arguments and returns JSX.  
 
-  setupFunction recive `props` as it's argument. `props` is a stable reference and made shallow reactive, so you can use mobx reactions to watch changes on props.
+  setupFunction receive `props` as it's argument. `props` is a stable reference and made shallow reactive, so you can use mobx reactions to watch changes on props.
 
 - **observable, reaction, autorun, when**
-  These are wrapper of mobx apis and do exactly the same thing as the same name in mobx, except when called synchronously inside the setupFunction, and will be automatically dispose when component unmount.  
+  These are wrappers of mobx api and do exactly the same thing as the same name in mobx, except when called synchronously inside the setupFunction, and will be automatically dispose when component unmount.  
 
   Use the babel plugin to auto transform these imports from mobx to this package.
 
@@ -139,9 +139,9 @@ export const App = defineComponent((_props) => {
   ```
   Callbacks will be called when the component mounted and unmounted.  
 
-  Callback are wrapped in `React.useEffect` hook, so using onMounted and onUnmounted is basically the same as React.useEffect with empty array as deps, except it is allow to use inside if statement, and the order doesn't matter.  
+  Callback are wrapped in `React.useEffect` hook, so using onMounted and onUnmounted is basically the same as React.useEffect with an empty array as deps, except it is allow to use inside if statement, and the order doesn't matter.  
 
-  Reactions won't be auto torn down in life cyclehooks.  
+  Reactions won't be auto torn down in life cycle hooks.  
 
   Tips: You can call `onUnmounted` synchronously inside `onMounted`.
 
@@ -155,6 +155,6 @@ export const App = defineComponent((_props) => {
   ```
   Callback passes to `runHook` will run every time before the component renders, just like normal hooks.  
 
-  `runHook` return result is the return value of the callback on it's first execution, so once after first execution, `result` here is never changed. To react to changes, modify state inside the callback. Normal hooks rules apply here, so you cant call hooks inside if statement.
+  The return value of `runHook` is the return value of the callback on its first execution, so once after the first execution, `result` here is never changed. To react to changes, modify the state inside the callback. Normal hooks rules apply here, so you cant call hooks inside if statement.
 
   Despite its name runHook, you can actually put anything inside it. It will run in every render, like in a normal functional component. putting a console.log in here is a typical way to monitoring re-renders.
