@@ -2,7 +2,18 @@
 
 All notable changes to this project will be documented in this file.
 
-## [0.0.4](https://github.com/Firefox-Pro-Coding/react-composition-api/compare/v0.0.2...v0.0.3) (2020-07-16)
+## [0.1.0](https://github.com/Firefox-Pro-Coding/react-composition-api/compare/v0.0.4...v0.1.0) (2020-07-16)
+
+### Breaking Change
+
+- removed `getOriginalProps` api
+
+### Bug Fixes
+
+- fix: remove getOriginalProps, batch props update in useEffect
+
+
+## [0.0.4](https://github.com/Firefox-Pro-Coding/react-composition-api/compare/v0.0.3...v0.0.4) (2020-07-16)
 
 ### feature
 
