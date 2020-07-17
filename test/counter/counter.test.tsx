@@ -2,8 +2,6 @@ import React from 'react'
 import { cleanup, render } from '@testing-library/react'
 import { Counter } from './counter'
 
-import 'mobx-react-lite/batchingOptOut'
-
 afterEach(cleanup)
 
 test('Counter', async () => {
@@ -32,4 +30,5 @@ test('Counter', async () => {
 
   component.unmount()
   expect(log).toBeCalledWith('unmounted')
+  expect(log).toReturnTimes(5)
 })

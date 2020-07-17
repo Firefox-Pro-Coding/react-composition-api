@@ -2,10 +2,7 @@ import React from 'react'
 import { cleanup, render } from '@testing-library/react'
 import { Basic, NestedOnUmounted } from './lifeCycle'
 
-import 'mobx-react-lite/batchingOptOut'
-
 afterEach(cleanup)
-
 
 test('Basic', () => {
   const log = jest.fn()
@@ -17,6 +14,7 @@ test('Basic', () => {
   expect(log).toBeCalledWith('render')
   component.unmount()
   expect(log).toBeCalledWith('unmounted')
+  expect(log).toBeCalledTimes(3)
 })
 
 
@@ -30,4 +28,5 @@ test('NestedOnUmounted', () => {
   expect(log).toBeCalledWith('render')
   component.unmount()
   expect(log).toBeCalledWith('unmounted')
+  expect(log).toBeCalledTimes(3)
 })

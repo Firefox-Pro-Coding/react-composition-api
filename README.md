@@ -157,13 +157,3 @@ export const App = defineComponent((_props) => {
   To react to changes, modify the state inside the callback. Normal hooks rules apply here, so you cant call hooks inside if statement.
 
   Despite its name runHook, you can put anything inside it. It runs in every render, like in a normal functional component. putting a console.log in here is a typical way to monitoring re-renders.
-
-- **getOriginalProps**
-  ```ts
-  runHook(() => {
-    const originalProps = getOriginalProps(props)
-  })
-  ```
-  Get the non-reactive props object, it can be use to prevent duplicate render cause by making the props reactive. If a component using some props in the render function, each time props update, the component will re-render twice, the first render is caused by React updating props, and the second render is caused by the reactive props update. Normally you wouldn't need to use this, but it's useful when there are some components with frequent props updates or heavy rerender function.
-
-  It's not a stable reference, so get it as close as where you want to use it.

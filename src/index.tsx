@@ -122,17 +122,6 @@ export const when: typeof mobx.when = (...args: Array<any>) => {
   return dispose
 }
 
-const weakMap = new WeakMap()
-
-export const getOriginalProps = <T extends unknown>(t: T) => {
-  const data = weakMap.get(t as any)
-  if (!data) {
-    // TODO:
-    throw new Error()
-  }
-  return data as T
-}
-
 /**
  * create component from setupFunction.
  * https://github.com/Firefox-Pro-Coding/react-composition-api#api-reference
@@ -141,12 +130,19 @@ export const getOriginalProps = <T extends unknown>(t: T) => {
 export const defineComponent = <P extends unknown>(
   setup: (p: P) => React.FunctionComponent,
 ) => {
-  const Component = observer((newProps: any) => {
+  const Component = (newProps: any) => {
     const propsRef = React.useRef<any>(null)
+    let firstRender = false
     if (propsRef.current === null) {
       propsRef.current = mobx.observable(newProps, {}, { deep: false })
-    } else {
+      firstRender = true
+    }
+
+    React.useEffect(() => {
       mobx.runInAction(() => {
+        if (firstRender) {
+          return
+        }
         const currentProps = propsRef.current
         const currentPropsKeys = mobx.keys(currentProps) as Array<string>
         const newPropsKeys = Object.keys(newProps)
@@ -158,8 +154,7 @@ export const defineComponent = <P extends unknown>(
           mobx.remove(currentProps, key)
         })
       })
-    }
-    weakMap.set(propsRef.current, newProps)
+    })
 
     const cachedSetup = React.useRef<unknown>(null)
     const component = React.useRef<any>(null)
@@ -192,6 +187,8 @@ export const defineComponent = <P extends unknown>(
       }
     }, [])
 
+    let subHooks = []
+
     if (!component.current || (cachedSetup.current !== null && cachedSetup.current !== setup)) {
       componentStore.current.disposes.forEach((v) => v())
       componentStore.current.disposes = []
@@ -206,10 +203,12 @@ export const defineComponent = <P extends unknown>(
       currentComponentStore = nextComponentStore.current
       cachedSetup.current = setup
       component.current = setup(propsRef.current)
-      currentComponentStore.subHooks.forEach((v) => v())
+      // currentComponentStore.subHooks.forEach((v) => v())
+      subHooks = currentComponentStore.subHooks
     } else {
       componentStore.current.hooks.forEach((v) => v())
-      componentStore.current.subHooks.forEach((v) => v())
+      // componentStore.current.subHooks.forEach((v) => v())
+      subHooks = componentStore.current.subHooks
     }
 
     if (nextComponentStore.current) {
@@ -217,10 +216,26 @@ export const defineComponent = <P extends unknown>(
       nextComponentStore.current = null
     }
 
+    const C = React.useRef<any>()
+    if (!C.current) {
+      C.current = observer((props: any) => {
+        props.subHooks.forEach((v: any) => v())
+        return component.current()
+      })
+    }
+
     currentComponentStore = null
 
-    return component.current()
-  })
+    // return component.current()
+    return (
+      // eslint-disable-next-line react/jsx-pascal-case
+      <C.current
+        props={propsRef.current}
+        subHooks={subHooks}
+        key={1}
+      />
+    )
+  }
 
   return Component as React.FunctionComponent<P>
 }

@@ -3,8 +3,6 @@ import { observable } from 'mobx'
 import { cleanup, render } from '@testing-library/react'
 import { Autorun, Reaction, When, ReactionInMounted } from './dispose'
 
-import 'mobx-react-lite/batchingOptOut'
-
 afterEach(cleanup)
 
 test('Reaction', () => {
