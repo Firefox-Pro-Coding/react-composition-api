@@ -8,6 +8,8 @@
 > Writing react component with the mindset of vue composition api! 🙌  
 > To learn more about the concept of composition api: https://vue-composition-api-rfc.netlify.app/
 
+⚠ This lib is not stable yet, **DO NOT** use it in a production environment
+
 ## Install
 ```sh
 # react 16.8 is required for hooks
@@ -27,6 +29,8 @@ Pass a setup function to `defineComponent` to create a Component.
 Upon component per component instance creation, `setupFunction` will be running only once and should return a function accepts no argument that returns JSX. Only the returned function will be running again to generate the new virtual dom.  
 
 Normally, you need to tear down mobx `reaction` watchers when component unmounted. If you'd like to get it automatically done, import these reactivity utilities wrappers from `@firefox-pro-coding/react-composition-api`, or use the babel plugin to transform imports from `mobx` to this package. In setupFunction, synchronized calls to mobx reactions will be detected and tear down automatically when component unmount.
+
+You can't use any react hooks directly in the setupFunction, as it will only run once. If any hooks are used, you will have problems about react complaining rendering fewer hooks etc.
 
 ```js
 // using wrapper from @firefox-pro-coding/react-composition-api
@@ -137,13 +141,19 @@ export const App = defineComponent((_props) => {
   onMounted(() => { console.log('mounted') })
   onUnmounted(() => { console.log('unmounted') })
   ```
-  Callbacks will be called when the component mounted and unmounted.  
+  Life Cycle hooks when the component mounted and unmounted.  
 
-  Callback are wrapped in `React.useEffect` hook, so using onMounted and onUnmounted is basically the same as React.useEffect with an empty array as deps, except it is allow to use inside if statement, and the order doesn't matter.  
+  Callback are wrapped in `React.useEffect` hook, so using onMounted and onUnmounted is the same as React.useEffect with an empty array as deps, except it's allowed to be used inside if statement, and the order doesn't matter.  
 
   Reactions won't be auto torn down in life cycle hooks.  
 
   Tips: You can call `onUnmounted` synchronously inside `onMounted`.
+
+- **onUpdated**
+  ```ts
+  onUpdated(() => { console.log('updated') })
+  ```
+  Life Cycle hooks when component render completes. Callback are wrapped in `React.useEffect` hook with no deps.
 
 - **runhook**
   ```ts
@@ -157,3 +167,13 @@ export const App = defineComponent((_props) => {
   To react to changes, modify the state inside the callback. Normal hooks rules apply here, so you cant call hooks inside if statement.
 
   Despite its name runHook, you can put anything inside it. It runs in every render, like in a normal functional component. putting a console.log in here is a typical way to monitoring re-renders.
+
+  What's the difference of `runHook` and `onUpdated`? You can think them of as this:
+  ```ts
+  const Component = () => {
+    executeRunHook()
+    React.useEffect(() => {
+      executeOnUpdated()
+    })
+  }
+  ```

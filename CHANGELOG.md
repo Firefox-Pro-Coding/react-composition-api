@@ -2,8 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
-## [0.1.0](https://github.com/Firefox-Pro-Coding/react-composition-api/compare/v0.0.4...v0.1.0) (2020-07-16)
+## 0.2.0
+### Feature
 
+- feat: onUpdated
+
+
+
+## 0.1.0
 ### Breaking Change
 
 - removed `getOriginalProps` api
@@ -13,8 +19,8 @@ All notable changes to this project will be documented in this file.
 - fix: remove getOriginalProps, batch props update in useEffect
 
 
-## [0.0.4](https://github.com/Firefox-Pro-Coding/react-composition-api/compare/v0.0.3...v0.0.4) (2020-07-16)
 
+## 0.0.4
 ### feature
 
 - feat: reworked runHook, add tests
@@ -26,8 +32,7 @@ All notable changes to this project will be documented in this file.
 
 
 
-## [0.0.3](https://github.com/Firefox-Pro-Coding/react-composition-api/compare/v0.0.2...v0.0.3) (2020-07-15)
-
+## 0.0.3
 ### feature
 
 - feat: support onUnmounted in onMounted
@@ -40,13 +45,12 @@ All notable changes to this project will be documented in this file.
 
 
 
-## [0.0.2](https://github.com/Firefox-Pro-Coding/react-composition-api/compare/v0.0.1...v0.0.2) (2020-07-14)
-
+## 0.0.2
 ### Bug Fixes
 
 - fix: babel plugin not handle namespace import correctly
 
 
 
-## [0.0.1] (2020-07-13)
+## 0.0.1
 init
