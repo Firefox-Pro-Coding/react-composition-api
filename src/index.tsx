@@ -10,12 +10,13 @@ interface ComponentStore {
   subHooks: Array<CallBackFunction>
   mounted: Array<CallBackFunction>
   unmounted: Array<CallBackFunction>
+  updated: Array<CallBackFunction>
   mountedStage: boolean
 }
 
-let currentComponentStore: null | ComponentStore = null
+let currentStore: null | ComponentStore = null
 
-const insideSetup = () => !!currentComponentStore
+const insideSetup = () => !!currentStore
 
 const checkInsideSetup = (name: string) => {
   if (!insideSetup()) {
@@ -25,8 +26,8 @@ const checkInsideSetup = (name: string) => {
 
 
 const pushDispose = (dispose: mobx.IReactionDisposer) => {
-  if (currentComponentStore !== null && !currentComponentStore.mountedStage) {
-    currentComponentStore.disposes.push(dispose)
+  if (currentStore !== null && !currentStore.mountedStage) {
+    currentStore.disposes.push(dispose)
   }
 }
 
@@ -37,7 +38,7 @@ const pushDispose = (dispose: mobx.IReactionDisposer) => {
  */
 export const runHook = <T extends unknown>(fn: () => T) => {
   checkInsideSetup('runHook')
-  currentComponentStore!.subHooks.push(fn)
+  currentStore!.subHooks.push(fn)
 }
 
 
@@ -46,7 +47,7 @@ export const runHook = <T extends unknown>(fn: () => T) => {
  */
 export const onMounted = (cb: CallBackFunction) => {
   checkInsideSetup('onMounted')
-  currentComponentStore!.mounted.push(cb)
+  currentStore!.mounted.push(cb)
 }
 
 /**
@@ -54,7 +55,16 @@ export const onMounted = (cb: CallBackFunction) => {
  */
 export const onUnmounted = (cb: CallBackFunction) => {
   checkInsideSetup('onUnmounted')
-  currentComponentStore!.unmounted.push(cb)
+  currentStore!.unmounted.push(cb)
+}
+
+
+/**
+ * callback is executed when component is updated.
+ */
+export const onUpdated = (cb: CallBackFunction) => {
+  checkInsideSetup('onUpdated')
+  currentStore!.updated.push(cb)
 }
 
 
@@ -66,7 +76,7 @@ export const observable = ((...args: Parameters<typeof mobx.observable>) => {
       ref.current = mobx.observable(...args)
     }
 
-    currentComponentStore?.hooks.push(hook)
+    currentStore?.hooks.push(hook)
     return ref.current
   }
   return mobx.observable(...args)
@@ -92,7 +102,7 @@ observableStaticMethodFields.forEach((key) => {
       if (!ref.current) {
         ref.current = (mobx.observable[key] as any)(...args)
       }
-      currentComponentStore?.hooks.push(hook)
+      currentStore?.hooks.push(hook)
       return ref.current
     }
     return (mobx.observable[key] as any)(...args)
@@ -157,81 +167,84 @@ export const defineComponent = <P extends unknown>(
     })
 
     const cachedSetup = React.useRef<unknown>(null)
-    const component = React.useRef<any>(null)
-
-    const componentStore = React.useRef<ComponentStore>({
+    const renderFunction = React.useRef<any>(null)
+    const store = React.useRef<ComponentStore>({
       hooks: [],
-      subHooks: [],
       disposes: [],
+      subHooks: [],
       mounted: [],
       unmounted: [],
+      updated: [],
       mountedStage: false,
     })
-
-    const nextComponentStore = React.useRef<ComponentStore | null>(null)
+    const nextStore = React.useRef<ComponentStore | null>(null)
 
     React.useEffect(() => {
-      if (nextComponentStore.current) {
-        componentStore.current = nextComponentStore.current
-        nextComponentStore.current = null
+      if (nextStore.current) {
+        store.current = nextStore.current
+        nextStore.current = null
       }
-      currentComponentStore = componentStore.current
-      currentComponentStore.mountedStage = true
-      componentStore.current.mounted.forEach((v) => v())
-      currentComponentStore.mountedStage = false
-      currentComponentStore = null
+
+      currentStore = store.current
+      currentStore.mountedStage = true
+
+      store.current.mounted.forEach((v) => v())
+
+      currentStore.mountedStage = false
+      currentStore = null
+
       return () => {
-        componentStore.current.disposes.forEach((v) => v())
-        componentStore.current.disposes = []
-        componentStore.current.unmounted.forEach((v) => v())
+        store.current.disposes.forEach((v) => v())
+        store.current.disposes = []
+        store.current.unmounted.forEach((v) => v())
       }
     }, [])
 
-    let subHooks = []
+    let renderStore = store.current
 
-    if (!component.current || (cachedSetup.current !== null && cachedSetup.current !== setup)) {
-      componentStore.current.disposes.forEach((v) => v())
-      componentStore.current.disposes = []
-      nextComponentStore.current = {
+    if (!renderFunction.current || (cachedSetup.current !== null && cachedSetup.current !== setup)) {
+      store.current.disposes.forEach((v) => v())
+      store.current.disposes = []
+      nextStore.current = {
         hooks: [],
         subHooks: [],
         disposes: [],
         mounted: [],
         unmounted: [],
+        updated: [],
         mountedStage: false,
       }
-      currentComponentStore = nextComponentStore.current
+      currentStore = nextStore.current
+      renderStore = nextStore.current
       cachedSetup.current = setup
-      component.current = setup(propsRef.current)
-      // currentComponentStore.subHooks.forEach((v) => v())
-      subHooks = currentComponentStore.subHooks
+      renderFunction.current = setup(propsRef.current)
     } else {
-      componentStore.current.hooks.forEach((v) => v())
-      // componentStore.current.subHooks.forEach((v) => v())
-      subHooks = componentStore.current.subHooks
+      store.current.hooks.forEach((v) => v())
     }
 
-    if (nextComponentStore.current) {
-      componentStore.current = nextComponentStore.current
-      nextComponentStore.current = null
+    if (nextStore.current) {
+      store.current = nextStore.current
+      nextStore.current = null
     }
 
     const C = React.useRef<any>()
     if (!C.current) {
-      C.current = observer((props: any) => {
-        props.subHooks.forEach((v: any) => v())
-        return component.current()
+      C.current = observer((props: { renderStore: ComponentStore }) => {
+        props.renderStore.subHooks.forEach((v: any) => v())
+        React.useEffect(() => {
+          renderStore.updated.forEach((v) => v())
+        })
+        return renderFunction.current()
       })
     }
 
-    currentComponentStore = null
+    currentStore = null
 
-    // return component.current()
     return (
       // eslint-disable-next-line react/jsx-pascal-case
       <C.current
         props={propsRef.current}
-        subHooks={subHooks}
+        renderStore={renderStore}
         key={1}
       />
     )
