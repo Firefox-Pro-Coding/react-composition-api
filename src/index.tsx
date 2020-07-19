@@ -76,7 +76,7 @@ export const observable = ((...args: Parameters<typeof mobx.observable>) => {
       ref.current = mobx.observable(...args)
     }
 
-    currentStore?.hooks.push(hook)
+    currentStore!.hooks.push(hook)
     return ref.current
   }
   return mobx.observable(...args)
@@ -102,7 +102,7 @@ observableStaticMethodFields.forEach((key) => {
       if (!ref.current) {
         ref.current = (mobx.observable[key] as any)(...args)
       }
-      currentStore?.hooks.push(hook)
+      currentStore!.hooks.push(hook)
       return ref.current
     }
     return (mobx.observable[key] as any)(...args)
@@ -180,11 +180,6 @@ export const defineComponent = <P extends unknown>(
     const nextStore = React.useRef<ComponentStore | null>(null)
 
     React.useEffect(() => {
-      if (nextStore.current) {
-        store.current = nextStore.current
-        nextStore.current = null
-      }
-
       currentStore = store.current
       currentStore.mountedStage = true
 

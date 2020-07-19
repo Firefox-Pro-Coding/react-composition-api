@@ -1,11 +1,32 @@
 import React from 'react'
 import { observable } from 'mobx'
 import { cleanup, render } from '@testing-library/react'
-import { Autorun, Reaction, When, ReactionInMounted } from './dispose'
+import {
+  defineComponent,
+  reaction,
+  when,
+  autorun,
+  onMounted,
+} from '../../src'
+
+interface Props {
+  state: { count: number }
+}
 
 afterEach(cleanup)
 
-test('Reaction', () => {
+test('reaction', () => {
+  const Reaction = defineComponent((props: Props) => {
+    reaction(
+      () => props.state.count,
+      () => {
+        console.log('count is', props.state.count)
+      },
+    )
+
+    return () => <div />
+  })
+
   const log = jest.fn()
   global.console.log = log
   const state = observable({
@@ -29,7 +50,18 @@ test('Reaction', () => {
 })
 
 
-test('When', () => {
+test('when', () => {
+  const When = defineComponent((props: Props) => {
+    when(
+      () => props.state.count === 3,
+      () => {
+        console.log('count is', props.state.count)
+      },
+    )
+
+    return () => <div />
+  })
+
   const log = jest.fn()
   global.console.log = log
   const state = observable({
@@ -53,7 +85,17 @@ test('When', () => {
 })
 
 
-test('Autorun', () => {
+test('autorun', () => {
+  const Autorun = defineComponent((props: Props) => {
+    autorun(
+      () => {
+        console.log('count is', props.state.count)
+      },
+    )
+
+    return () => <div />
+  })
+
   const log = jest.fn()
   global.console.log = log
   const state = observable({
@@ -78,7 +120,20 @@ test('Autorun', () => {
 })
 
 
-test('ReactionInMounted', () => {
+test('reaction in mounted', () => {
+  const ReactionInMounted = defineComponent((props: Props) => {
+    onMounted(() => {
+      reaction(
+        () => props.state.count,
+        () => {
+          console.log('count is', props.state.count)
+        },
+      )
+    })
+
+    return () => <div />
+  })
+
   const log = jest.fn()
   global.console.log = log
   const state = observable({

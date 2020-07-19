@@ -2,6 +2,7 @@
   "compilerOptions": {
     "target": "ES2015",
     "module": "ESNext",
+    "allowJs": true,
     "moduleResolution": "node",
     "importHelpers": true,
     "jsx": "react",
@@ -10,7 +11,6 @@
     "baseUrl": ".",
     "strict": true,
     "skipLibCheck": true,
-    "declaration": true,
     "outDir": "../test_dist",
     "lib": [
       "DOM",

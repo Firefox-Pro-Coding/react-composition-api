@@ -9,8 +9,8 @@
   "scripts": {
     "build": "rimraf dist && yarn tsc",
     "test:build": "yarn tsc -p ./test/tsconfig.json",
-    "test": "jest",
-    "test:debug": "node --inspect-brk ./node_modules/@babel/cli/bin/babel.js ./test_dist/babel/test.js",
+    "test": "jest --collect-coverage",
+    "test:debug": "node --inspect-brk ./node_modules/jest/bin/jest.js --runInBand",
     "prepare": "yarn build",
     "lint": "eslint --ext \"js,jsx,ts,tsx\" ./src/"
   },

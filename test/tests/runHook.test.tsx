@@ -1,10 +1,25 @@
 import React from 'react'
 import { cleanup, render } from '@testing-library/react'
-import { RunHookSimple, RunHookUseEffect } from './runHook'
+import {
+  defineComponent,
+  runHook,
+} from '../../src'
+
+interface Props {
+  count: number
+}
 
 afterEach(cleanup)
 
-test('RunHookSimple', () => {
+test('runHook simple', () => {
+  const RunHookSimple = defineComponent((props: Props) => {
+    runHook(() => {
+      console.log('props.count is', props.count)
+    })
+
+    return () => <div />
+  })
+
   const log = jest.fn()
   global.console.log = log
   const component = render(
@@ -24,7 +39,20 @@ test('RunHookSimple', () => {
 })
 
 
-test('RunHookUseEffect', () => {
+test('runHook useEffect', () => {
+  const RunHookUseEffect = defineComponent(() => {
+    runHook(() => {
+      React.useEffect(() => {
+        console.log('mounted')
+        return () => {
+          console.log('unmounted')
+        }
+      }, [])
+    })
+
+    return () => <div />
+  })
+
   const log = jest.fn()
   global.console.log = log
   const component = render(

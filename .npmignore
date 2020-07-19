@@ -12,3 +12,4 @@
 /yarn.lock
 /*.tgz
 /jest.config.js
+/coverage

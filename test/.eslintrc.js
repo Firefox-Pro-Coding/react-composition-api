@@ -20,6 +20,7 @@ module.exports = {
     },
     rules: {
       'no-undef': 'off',
+      'no-console': 'off',
     },
   }],
 }
