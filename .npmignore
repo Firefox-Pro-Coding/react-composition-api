@@ -13,3 +13,4 @@
 /*.tgz
 /jest.config.js
 /coverage
+/codecov.yml

@@ -4,3 +4,4 @@
 /test_dist
 /*.tgz
 /coverage
+/codecov.yml

@@ -12,6 +12,7 @@
     "test": "jest --collect-coverage",
     "test:debug": "node --inspect-brk ./node_modules/jest/bin/jest.js --runInBand",
     "prepare": "yarn build",
+    "cov": "codecov -f ./coverage/lcov.info",
     "lint": "eslint --ext \"js,jsx,ts,tsx\" ./src/"
   },
   "dependencies": {},
