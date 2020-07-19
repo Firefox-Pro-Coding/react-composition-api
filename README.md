@@ -4,7 +4,7 @@
 [![license](https://img.shields.io/badge/license-MIT-green.svg?longCache=true&style=flat-square)](LICENSE)
 ![David](https://img.shields.io/david/Firefox-Pro-Coding/react-composition-api.svg?style=flat-square)
 ![David](https://img.shields.io/david/dev/Firefox-Pro-Coding/react-composition-api.svg?style=flat-square)
-![Coverage](https://img.shields.io/codecov/c/github/Firefox-Pro-Coding/react-composition-api?style=flat-square)
+[![Coverage](https://img.shields.io/codecov/c/github/Firefox-Pro-Coding/react-composition-api?style=flat-square)](https://codecov.io/gh/Firefox-Pro-Coding/react-composition-api)
 
 > Writing react component with the mindset of vue composition api! 🙌  
 > To learn more about the concept of composition api: https://vue-composition-api-rfc.netlify.app/
