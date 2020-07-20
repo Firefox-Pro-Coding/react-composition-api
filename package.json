@@ -1,7 +1,7 @@
 {
   "name": "@firefox-pro-coding/react-composition-api",
   "description": "Writing react component with composition api",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "main": "lib/index.js",
   "module": "lib/index.js",
   "typings": "lib/index.d.ts",

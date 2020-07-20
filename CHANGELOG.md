@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## 0.2.1
+### Bug Fixes
+
+- fix: reaction not working after fast refresh. refactor code
+
+
+
 ## 0.2.0
 ### Feature
 
