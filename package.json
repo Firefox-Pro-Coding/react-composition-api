@@ -3,6 +3,7 @@
   "description": "Writing react component with composition api",
   "version": "0.2.0",
   "main": "lib/index.js",
+  "module": "lib/index.js",
   "typings": "lib/index.d.ts",
   "author": "noe132 <nnnnoe132@gmail.com>",
   "license": "MIT",

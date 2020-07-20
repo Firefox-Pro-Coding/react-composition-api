@@ -11,6 +11,7 @@ module.exports = {
   setupFiles: [
     './test/setup.ts',
   ],
+  coverageReporters: ['html', 'lcov', 'text'],
   collectCoverageFrom: [
     './src/**/*',
   ],

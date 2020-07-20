@@ -17,7 +17,7 @@ test('props key change', () => {
     reaction(
       () => props.textA,
       () => {
-        console.log(props.textA)
+        console.log('textA', props.textA)
       },
       { fireImmediately: true },
     )
@@ -25,7 +25,7 @@ test('props key change', () => {
     reaction(
       () => props.textB,
       () => {
-        console.log(props.textB)
+        console.log('textB', props.textB)
       },
       { fireImmediately: true },
     )
@@ -39,19 +39,19 @@ test('props key change', () => {
   const component = render(
     <Component {...{ textA: 'textA' }} />,
   )
-  expect(log).toBeCalledWith('textA')
-  expect(log).toBeCalledWith(undefined)
+  expect(log).toBeCalledWith('textA', 'textA')
+  expect(log).toBeCalledWith('textB', undefined)
 
   component.rerender(
     <Component {...{ textA: 'textA', textB: 'textB' }} />,
   )
 
-  expect(log).toBeCalledWith('textB')
+  expect(log).toBeCalledWith('textB', 'textB')
 
   component.rerender(
     <Component {...{ textA: 'textA' }} />,
   )
 
-  expect(log).toBeCalledWith(undefined)
+  expect(log).toBeCalledWith('textB', undefined)
   expect(log).toBeCalledTimes(4)
 })
