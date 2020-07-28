@@ -27,11 +27,20 @@ Pass a setup function to `defineComponent` to create a Component.
 
 `setupFunction` receive props object as an argument. `props` is a [shallow reactive object](https://mobx.js.org/refguide/api.html#decorators), you can use `reaction` to watch changes on props.
 
-Upon component per component instance creation, `setupFunction` will be running only once and should return a function accepts no argument that returns JSX. Only the returned function will be running again to generate the new virtual dom.  
+Upon every instance creation, `setupFunction` will be running only once. The `setupFunction` should return a function that accepts no argument and returns JSX. Only the returned render function will be running again to generate the new virtual dom.  
 
 Normally, you need to tear down mobx `reaction` watchers when component unmounted. If you'd like to get it automatically done, import these reactivity utilities wrappers from `@firefox-pro-coding/react-composition-api`, or use the babel plugin to transform imports from `mobx` to this package. In setupFunction, synchronized calls to mobx reactions will be detected and tear down automatically when component unmount.
 
 You can't use any react hooks directly in the setupFunction, as it will only run once. If any hooks are used, you will have problems about react complaining rendering fewer hooks etc.
+
+## Benefits
+- Encapsulating and Composing data and logic without restriction rules of react hooks
+- setup only execute once, less gc pressure
+
+## Babel Plugin
+
+To get auto tearing down when component unmounted, you have to use mobx api wrapper from this package, or use the babel plugin to transform imports from mobx to 
+this package automatically.
 
 ```js
 // using wrapper from @firefox-pro-coding/react-composition-api
@@ -42,6 +51,7 @@ import {
   when,
 } from '@firefox-pro-coding/react-composition-api'
 ```
+
 ```js
 // or using babel to auto transform
 // .babelrc.js
@@ -115,7 +125,7 @@ export const App = defineComponent((_props) => {
 ```
 
 ## Api Reference
-- **defineComponent**
+- **defineComponent**  
   ```jsx
   const Component = definedComponent((props) => () => {
     // props is shallow reactive
@@ -132,12 +142,12 @@ export const App = defineComponent((_props) => {
 
   setupFunction receive `props` as it's argument. `props` is a stable reference and made shallow reactive, so you can use mobx reactions to watch changes on props.
 
-- **observable, reaction, autorun, when**
-  These are wrappers of mobx api and do exactly the same thing as the same name in mobx, except when called synchronously inside the setupFunction, and will be automatically disposed when component unmount.  
+- **observable, reaction, autorun, when**  
+  These are wrappers of mobx api and do exactly the same thing as the same name in mobx, except when called inside the setupFunction synchronously, and will be automatically disposed when component unmount.  
 
   Use the babel plugin to auto transform these imports from mobx to this package.
 
-- **onMounted, onUnmounted**
+- **onMounted, onUnmounted**  
   ```ts
   onMounted(() => { console.log('mounted') })
   onUnmounted(() => { console.log('unmounted') })
@@ -148,15 +158,15 @@ export const App = defineComponent((_props) => {
 
   Reactions won't be auto torn down in life cycle hooks.  
 
-  Tips: You can call `onUnmounted` synchronously inside `onMounted`.
+  Tips: You can call `onUnmounted` inside `onMounted` synchronously.
 
-- **onUpdated**
+- **onUpdated**  
   ```ts
   onUpdated(() => { console.log('updated') })
   ```
   Life Cycle hooks when component render completes. Callback are wrapped in `React.useEffect` hook with no deps.
 
-- **runhook**
+- **runhook**  
   ```ts
   runHook(() => {
     const value = React.useContext(MyContext)
@@ -178,3 +188,29 @@ export const App = defineComponent((_props) => {
     })
   }
   ```
+
+
+## Tips
+
+If you are using fast refresh in development, and wish states to preserve when component was changed and hot reloaded, all the states that preserve must be in a observable.
+```tsx
+const Component = defineComponent(() => {
+  // rootRef will be a new ref with current as null when component hot reloaded
+  const rootRef = React.createRef<HTMLDivElement>(),
+
+  return () => (
+    <div ref={rootRef}>root</div>
+  )
+})
+
+const Component = defineComponent(() => {
+  // state.rootRef will still be the same value as before hot reload
+  const state = observable({
+    rootRef: React.createRef<HTMLDivElement>(),
+  }, { rootRef: observable.shallow })
+
+  return () => (
+    <div ref={state.rootRef}>root</div>
+  )
+})
+```
