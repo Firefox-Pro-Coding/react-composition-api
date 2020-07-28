@@ -164,7 +164,15 @@ export const App = defineComponent((_props) => {
   ```ts
   onUpdated(() => { console.log('updated') })
   ```
-  Life Cycle hooks when component render completes. Callback are wrapped in `React.useEffect` hook with no deps.
+  Life Cycle hooks when component render completes.  
+  ```tsx
+  onUpdated(cb)
+  // basically same as
+  React.useEffect(() => {
+    cb()
+  }, [])
+  ```
+
 
 - **runhook**  
   ```ts
