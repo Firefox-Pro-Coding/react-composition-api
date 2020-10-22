@@ -88,6 +88,7 @@ test('namespace import', () => {
   const result = `
   import * as mobx from "mobx";
   `
+
   const output = babel.transform(
     source.replace(/\n\s+/g, '\n'),
     { plugins: [babelPlugin] },

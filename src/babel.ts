@@ -9,7 +9,7 @@ const transformImports = [
 ]
 
 const transform = (t: typeof tp, path: bt.NodePath<tp.Program>) => {
-  const body = path.get('body')
+  const body = path.get('body') as Array<bt.NodePath>
   const importNodePaths = body.filter((p) => p.isImportDeclaration()) as Array<bt.NodePath<tp.ImportDeclaration>>
   const mboxImportPaths = importNodePaths.filter((p) => p.node.source.value === 'mobx')
   const mboxImportNodes = mboxImportPaths.map((p) => p.node)
@@ -22,14 +22,25 @@ const transform = (t: typeof tp, path: bt.NodePath<tp.Program>) => {
       if (!t.isImportSpecifier(s)) {
         return
       }
-      if (transformImports.includes(s.imported.name)) {
+      if (s.imported.type === 'StringLiteral') {
+        return
+      }
+      const importName = s.imported.name
+      if (transformImports.includes(importName)) {
         needTransformImports.push({
-          name: s.imported.name,
+          name: importName,
           localName: s.local.name,
         })
       }
     })
-    imp.specifiers = imp.specifiers.filter((s) => !t.isImportSpecifier(s) || !transformImports.includes(s.imported.name))
+    imp.specifiers = imp.specifiers.filter((s) => {
+      if (t.isImportSpecifier(s) && s.imported.type === 'Identifier') {
+        const importName = s.imported.name
+        return !transformImports.includes(importName)
+      }
+
+      return true
+    })
   })
 
   if (needTransformImports.length) {

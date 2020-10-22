@@ -54,7 +54,8 @@ export const defineComponent = <P extends unknown>(
     let firstRender = false
     if (!state.props) {
       firstRender = true
-      state.props = mobx.observable(newProps, {}, { deep: false })
+      state.props = mobx.observable({}, {}, { deep: false })
+      extendsProps(state.props, newProps)
     }
 
     React.useEffect(() => {
@@ -63,15 +64,7 @@ export const defineComponent = <P extends unknown>(
         if (firstRender) {
           return
         }
-        const existedKeys = mobx.keys(state.props) as Array<string>
-        const newKeys = Object.keys(newProps)
-        const toDeletedKeys = existedKeys.filter((v) => !newKeys.includes(v))
-
-        Object.assign(state.props, newProps)
-
-        toDeletedKeys.forEach((key) => {
-          mobx.remove(state.props, key)
-        })
+        extendsProps(state.props, newProps)
       })
     })
 
@@ -144,4 +137,16 @@ export const defineComponent = <P extends unknown>(
   }
 
   return Component as React.FunctionComponent<P>
+}
+
+const extendsProps = (props: any, newProps: any) => {
+  const existedKeys = mobx.keys(props) as Array<string>
+  const newKeys = Object.keys(newProps)
+  const toDeletedKeys = existedKeys.filter((v) => !newKeys.includes(v))
+
+  Object.assign(props, newProps)
+
+  toDeletedKeys.forEach((key) => {
+    mobx.remove(props, key)
+  })
 }

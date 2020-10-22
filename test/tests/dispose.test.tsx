@@ -1,5 +1,5 @@
 import React from 'react'
-import { observable } from 'mobx'
+import { observable, runInAction } from 'mobx'
 import { cleanup, render } from '@testing-library/react'
 import {
   defineComponent,
@@ -36,16 +36,19 @@ test('reaction', () => {
   const component = render(
     <Reaction state={state} />,
   )
-
-  state.count = 2
+  runInAction(() => {
+    state.count = 2
+  })
   expect(log).toBeCalledWith('count is', 2)
-
-  state.count = 3
+  runInAction(() => {
+    state.count = 3
+  })
   expect(log).toBeCalledWith('count is', 3)
 
   component.unmount()
-
-  state.count = 4
+  runInAction(() => {
+    state.count = 4
+  })
   expect(log).toBeCalledTimes(2)
 })
 
@@ -71,16 +74,19 @@ test('when', () => {
   const component = render(
     <When state={state} />,
   )
-
-  state.count = 2
+  runInAction(() => {
+    state.count = 2
+  })
   expect(log).toBeCalledTimes(0)
-
-  state.count = 3
+  runInAction(() => {
+    state.count = 3
+  })
   expect(log).toBeCalledWith('count is', 3)
 
   component.unmount()
-
-  state.count = 4
+  runInAction(() => {
+    state.count = 4
+  })
   expect(log).toBeCalledTimes(1)
 })
 
@@ -106,16 +112,19 @@ test('autorun', () => {
     <Autorun state={state} />,
   )
   expect(log).toBeCalledWith('count is', 1)
-
-  state.count = 2
+  runInAction(() => {
+    state.count = 2
+  })
   expect(log).toBeCalledWith('count is', 2)
-
-  state.count = 3
+  runInAction(() => {
+    state.count = 3
+  })
   expect(log).toBeCalledWith('count is', 3)
 
   component.unmount()
-
-  state.count = 4
+  runInAction(() => {
+    state.count = 4
+  })
   expect(log).toBeCalledTimes(3)
 })
 
@@ -144,12 +153,16 @@ test('reaction in mounted', () => {
     <ReactionInMounted state={state} />,
   )
 
-  state.count = 2
+  runInAction(() => {
+    state.count = 2
+  })
   expect(log).toBeCalledWith('count is', 2)
 
   component.unmount()
 
-  state.count = 3
+  runInAction(() => {
+    state.count = 3
+  })
   expect(log).toBeCalledWith('count is', 3)
   expect(log).toBeCalledTimes(2)
 })

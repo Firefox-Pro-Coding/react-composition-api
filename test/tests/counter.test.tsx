@@ -1,4 +1,5 @@
 import React from 'react'
+import { action } from 'mobx'
 import { cleanup, render } from '@testing-library/react'
 import {
   defineComponent,
@@ -29,8 +30,8 @@ test('counter', async () => {
     )
 
     // methods
-    const handleAdd = () => { state.count += 1 }
-    const handleSub = () => { state.count -= 1 }
+    const handleAdd = action(() => { state.count += 1 })
+    const handleSub = action(() => { state.count -= 1 })
 
     // render function
     return () => (
@@ -89,13 +90,13 @@ test('counter 2', async () => {
     )
 
     // methods
-    const handleAdd = () => {
+    const handleAdd = action(() => {
       state.set('count', state.get('count')! + 1)
-    }
+    })
 
-    const handleSub = () => {
+    const handleSub = action(() => {
       state.set('count', state.get('count')! - 1)
-    }
+    })
 
     // render function
     return () => (
