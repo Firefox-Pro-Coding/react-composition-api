@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## 0.2.3
+### Bug Fixes
+
+- fix: babel tsc build
+
+
+
 ## 0.2.2
 ### Bug Fixes
 
