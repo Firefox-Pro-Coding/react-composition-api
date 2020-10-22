@@ -8,7 +8,7 @@
   "author": "noe132 <nnnnoe132@gmail.com>",
   "license": "MIT",
   "scripts": {
-    "build": "rimraf dist && yarn tsc",
+    "build": "rimraf dist && yarn tsc && yarn tsc -p tsconfig_babel.json",
     "test:build": "yarn tsc -p ./test/tsconfig.json",
     "test": "jest --collect-coverage",
     "test:debug": "node --inspect-brk ./node_modules/jest/bin/jest.js --runInBand",

@@ -5,8 +5,8 @@ module.exports = (api) => {
 
   const config = {
     plugins: [
-      // path.join(__dirname, './src/babel.js')
-      '@babel/preset-typescript',
+      path.join(__dirname, './babel.js'),
+      // '@babel/preset-typescript',
     ],
   };
 
