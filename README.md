@@ -6,10 +6,16 @@
 ![David](https://img.shields.io/david/dev/Firefox-Pro-Coding/react-composition-api.svg?style=flat-square)
 [![Coverage](https://img.shields.io/codecov/c/github/Firefox-Pro-Coding/react-composition-api?style=flat-square)](https://codecov.io/gh/Firefox-Pro-Coding/react-composition-api)
 
-> Writing react component with the mindset of vue composition api! 🙌  
-> To learn more about the concept of composition api: https://vue-composition-api-rfc.netlify.app/
+> Using React + Mobx with composition api style! 🙌  
 
-⚠ This lib is not stable yet, **DO NOT** use it in a production environment
+- [Install](#install)
+- [Usage](#usage)
+- [Babel Plugin](#babel-plugin)
+- [Api Reference](#api-reference)
+- [Tips](#tips)
+
+Using mobx + react, you can write React components in composition api with this lib. Zero dependency and less than 2kb gzip!
+
 
 ## Install
 ```sh
@@ -20,27 +26,36 @@ yarn add @firefox-pro-coding/react-composition-api
 ```
 
 ## Usage
-```ts
-const Component = defineComponent((props) => renderFunction)
+```tsx
+const Component = defineComponent((props) => {
+  const state = observable({ count: 1 })
+  const add = action(() => { state.count += 1 })
+
+  return () => (
+    <div>
+      hello world! {state.count}
+      <button onClick={add}>add</button>
+    </div>
+  )
+})
 ```
-Pass a setup function to `defineComponent` to create a Component.  
+another [`counter example`](docs/counter.md)  
 
-`setupFunction` receive props object as an argument. `props` is a [shallow reactive object](https://mobx.js.org/refguide/api.html#decorators), you can use `reaction` to watch changes on props.
+Pass a `setupFunction` to `defineComponent` to create a Component.  
 
-Upon every instance creation, `setupFunction` will be running only once. The `setupFunction` should return a function that accepts no argument and returns JSX. Only the returned render function will be running again to generate the new virtual dom.  
+`setupFunction` will run once per component and the render funtion it returns is used for rendering if any of it's dependencies changes.
 
-Normally, you need to tear down mobx `reaction` watchers when component unmounted. If you'd like to get it automatically done, import these reactivity utilities wrappers from `@firefox-pro-coding/react-composition-api`, or use the babel plugin to transform imports from `mobx` to this package. In setupFunction, synchronized calls to mobx reactions will be detected and tear down automatically when component unmount.
+`props` is a [shallow reactive object](https://mobx.js.org/refguide/api.html#decorators) for the props that the parent pass to it, you can use `reaction` to watch changes on props.
 
 You can't use any react hooks directly in the setupFunction, as it will only run once. If any hooks are used, you will have problems about react complaining rendering fewer hooks etc.
 
-## Benefits
-- Encapsulating and Composing data and logic without restriction rules of react hooks
+### Benefits
+- better component logic composition
 - setup only execute once, less gc pressure
+- little hooks involved, reduce some boilerplate
 
 ## Babel Plugin
-
-To get auto tearing down when component unmounted, you have to use mobx api wrapper from this package, or use the babel plugin to transform imports from mobx to 
-this package automatically.
+Normally, you need to tear down mobx `reaction` watchers when component unmounted. You can import these reactivity utilities wrappers from `@firefox-pro-coding/react-composition-api`, or use the babel plugin to transform imports from `mobx` to this package.
 
 ```js
 // using wrapper from @firefox-pro-coding/react-composition-api
@@ -76,52 +91,6 @@ import {
   when,
   reaction,
 } from '@firefox-pro-coding/react-composition-api'
-```
-
-
-## Counter Example
-```tsx
-import React from 'react'
-
-import {
-  defineComponent,
-  onMounted,
-  onUnmounted,
-  reaction,
-  observable,
-} from '@firefox-pro-coding/react-composition-api'
-
-export const App = defineComponent((_props) => {
-  const state = observable({
-    count: 0,
-  })
-
-  const box = React.createRef<HTMLDivElement>()
-
-  // life cycle hooks
-  onMounted(() => { console.log('mounted') })
-  onUnmounted(() => { console.log('unmounted') })
-
-  // observation
-  reaction(
-    () => state.count,
-    () => { console.log('new value is', state.count) },
-    { fireImmediately: true },
-  )
-
-  // methods
-  const handleAdd = () => { state.count += 1 }
-  const handleSub = () => { state.count -= 1 }
-
-  // render function
-  return () => (
-    <div ref={box}>
-      <div>{state.count}</div>
-      <button onClick={handleAdd}>add</button>
-      <button onClick={handleSub}>sub</button>
-    </div>
-  )
-})
 ```
 
 ## Api Reference
@@ -176,16 +145,18 @@ export const App = defineComponent((_props) => {
 
 - **runhook**  
   ```ts
+  const state = observable({
+    value: 0,
+  })
+
   runHook(() => {
-    const value = React.useContext(MyContext)
-    state.contextValue = value
+    const newValue = React.useContext(MyContext)
+    state.value = newValue
   })
   ```
-  Callback passes to `runHook` will run every time before the component renders, just like normal hooks.  
+  Callback passes to `runHook` will run every time before the component renders, just like normal hooks. Regular hook rules applies here.  
 
   To react to changes, modify the state inside the callback. Normal hooks rules apply here, so you cant call hooks inside if statement.
-
-  Despite its name runHook, you can put anything inside it. It runs in every render, like in a normal functional component. putting a console.log in here is a typical way to monitoring re-renders.
 
   What's the difference of `runHook` and `onUpdated`? You can think them of as this:
   ```ts
@@ -199,8 +170,9 @@ export const App = defineComponent((_props) => {
 
 
 ## Tips
+Want to learn more about composition api? Check out vue composition api RFC https://vue-composition-api-rfc.netlify.app/  
 
-If you are using fast refresh in development, and wish states to preserve when component was changed and hot reloaded, all the states that preserve must be in a observable.
+If you are using fast refresh in development, and wish states to preserve when component was changed and hot reloaded, all the states that preserve must be in a observable, because observable calls were cached when hot reload, and others were not.
 ```tsx
 const Component = defineComponent(() => {
   // rootRef will be a new ref with current as null when component hot reloaded
