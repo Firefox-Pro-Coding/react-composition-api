@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## 1.0.0
+no breaking change from 0.2.3.
+
+### Bug Fixes
+
+- fix: tsc build module type
+
+
 ## 0.2.3
 ### Bug Fixes
 
