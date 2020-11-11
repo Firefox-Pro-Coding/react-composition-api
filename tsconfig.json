@@ -1,9 +1,9 @@
 {
   "compilerOptions": {
     "target": "ES2015",
-    "module": "ESNext",
+    "module": "CommonJS",
     "moduleResolution": "node",
-    "importHelpers": true,
+    "importHelpers": false,
     "jsx": "react",
     "esModuleInterop": true,
     "sourceMap": true,
