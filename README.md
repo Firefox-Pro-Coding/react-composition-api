@@ -96,7 +96,7 @@ import {
 ## Api Reference
 - **defineComponent**  
   ```jsx
-  const Component = definedComponent((props) => () => {
+  const Component = definedComponent((props) => {
     // props is shallow reactive
     // define your state actions in here
 
